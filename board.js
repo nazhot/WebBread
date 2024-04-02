@@ -6,6 +6,32 @@ const boardTypes = Object.freeze({
 
 const boardIds = ["Full", "Half", "Mini"];
 
+class Hole { 
+    constructor( x, y, s, isPower ) {
+        this.x = x;
+        this.y = y;
+        this.size = s;
+        this.isPower = isPower;
+        this.isPowered = false;
+        this.indexConnectedTo = null;
+    }
+
+    draw() {
+        if ( hoveredOver() ) {
+            fill( 100, 0, 0 );
+        } else {
+            fill( 255, 0, 0 );
+        }
+        noStroke();
+        rectMode( CORNER );
+        rect( this.x, this.y, this.size, this.size );
+    }
+
+    hoveredOver() {
+        return mouseX <= this.x + this.size && mouseX >= this.x &&
+               mouseY <= this.y + this.size && mouseY >= this.y;
+    }
+}
 
 
 class Board {
