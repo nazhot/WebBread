@@ -14,10 +14,12 @@ class Hole {
         this.isPower = isPower;
         this.isPowered = false;
         this.indexConnectedTo = null;
+        this.isHovered = false;
     }
 
     draw() {
-        if ( this.hoveredOver() ) {
+        this.isHovered = this.hoveredOver();
+        if ( this.isHovered ) {
             fill( 100, 0, 0 );
         } else {
             fill( 255, 0, 0 );
@@ -52,6 +54,7 @@ class Board {
         this.centerWidth = this.powerWidth * 4.0;
         this.holeSize = ( this.powerWidth - this.border * 2.5 ) / 2;
         this.powerGap = ( this.l - this.border * 2 - this.holeSize * ( this.powerGroups * this.numPerGroup ) - ( this.border / 2 ) * ( this.powerGroups * ( this.numPerGroup  ) - 1 ) ) / ( this.powerGroups - 1 );
+        this.wireDrawingOrigin = null;
         this.setupHoles();
     }
 
@@ -78,10 +81,24 @@ class Board {
         rect( this.x, this.y, this.l, this.powerWidth );
         rect( this.x, this.y + this.w, this.l, -this.powerWidth );
 
-        for ( let i = 0; i < this.powerGroups * this.numPerGroup * 4; ++i ) {
-            this.holes[i].draw();
+        if ( !mouseIsPressed ) {
+            this.wireDrawingOrigin = null;
         }
 
+        for ( let i = 0; i < this.powerGroups * this.numPerGroup * 4; ++i ) {
+            this.holes[i].draw();
+            if ( !this.wireDrawingOrigin && this.holes[i].isHovered && mouseIsPressed ) {
+                this.wireDrawingOrigin = { x: this.holes[i].x + this.holeSize / 2.0,
+                                           y: this.holes[i].y + this.holeSize / 2.0
+                                         };
+            }
+        }
+        if ( this.wireDrawingOrigin ) {
+            fill( 123, 45, 200 );
+            stroke( 2 );
+            line( this.wireDrawingOrigin.x, this.wireDrawingOrigin.y,
+                  mouseX, mouseY );
+        }
     }
 
 }
