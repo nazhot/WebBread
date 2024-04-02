@@ -55,6 +55,7 @@ class Board {
         this.holeSize = ( this.powerWidth - this.border * 2.5 ) / 2;
         this.powerGap = ( this.l - this.border * 2 - this.holeSize * ( this.powerGroups * this.numPerGroup ) - ( this.border / 2 ) * ( this.powerGroups * ( this.numPerGroup  ) - 1 ) ) / ( this.powerGroups - 1 );
         this.wireDrawingOrigin = null;
+        this.wires = [];
         this.setupHoles();
     }
 
@@ -81,18 +82,44 @@ class Board {
         rect( this.x, this.y, this.l, this.powerWidth );
         rect( this.x, this.y + this.w, this.l, -this.powerWidth );
 
+        let selectEndPoint = false;
+        let originIndex;
         if ( !mouseIsPressed ) {
+            if ( this.wireDrawingOrigin ) {
+                selectEndPoint = true;
+                originIndex = this.wireDrawingOrigin.index;
+            }
             this.wireDrawingOrigin = null;
         }
 
         for ( let i = 0; i < this.powerGroups * this.numPerGroup * 4; ++i ) {
             this.holes[i].draw();
+            if ( selectEndPoint && this.holes[i].isHovered ) {
+                if ( i !== originIndex ) {
+                    this.holes[i].indexConnectedTo = originIndex;
+                    this.holes[originIndex].indexConnectedTo = i;
+                    this.wires.push( { startIndex: originIndex,
+                                       endIndex: i
+                                     } );
+                }
+            }
             if ( !this.wireDrawingOrigin && this.holes[i].isHovered && mouseIsPressed ) {
-                this.wireDrawingOrigin = { x: this.holes[i].x + this.holeSize / 2.0,
+                this.wireDrawingOrigin = { index: i,
+                                           x: this.holes[i].x + this.holeSize / 2.0,
                                            y: this.holes[i].y + this.holeSize / 2.0
                                          };
             }
         }
+
+        for ( let wire of this.wires ) {
+            fill( 123, 45, 200 );
+            stroke( 2 );
+            line( this.holes[wire.startIndex].x + this.holeSize / 2.0, 
+                  this.holes[wire.startIndex].y + this.holeSize / 2.0,
+                  this.holes[wire.endIndex].x + this.holeSize / 2.0,
+                  this.holes[wire.endIndex].y + this.holeSize / 2.0 );
+        }
+
         if ( this.wireDrawingOrigin ) {
             fill( 123, 45, 200 );
             stroke( 2 );
