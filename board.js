@@ -17,7 +17,7 @@ class Hole {
     }
 
     draw() {
-        if ( hoveredOver() ) {
+        if ( this.hoveredOver() ) {
             fill( 100, 0, 0 );
         } else {
             fill( 255, 0, 0 );
@@ -52,6 +52,19 @@ class Board {
         this.centerWidth = this.powerWidth * 4.0;
         this.holeSize = ( this.powerWidth - this.border * 2.5 ) / 2;
         this.powerGap = ( this.l - this.border * 2 - this.holeSize * ( this.powerGroups * this.numPerGroup ) - ( this.border / 2 ) * ( this.powerGroups * ( this.numPerGroup  ) - 1 ) ) / ( this.powerGroups - 1 );
+        this.setupHoles();
+    }
+
+    setupHoles() {
+        this.holes = [];
+        let numPowerHoles = this.powerGroups * this.numPerGroup;
+        for ( let i = 0; i < numPowerHoles; ++i ) {
+            let xPos = this.x + this.border + i * ( this.border / 2 + this.holeSize ) + Math.floor( i / this.numPerGroup ) * this.powerGap;
+            this.holes[i] = new Hole( xPos, this.y + this.border, this.holeSize );
+            this.holes[i + numPowerHoles] = new Hole( xPos, this.y + this.border * 1.5 + this.holeSize, this.holeSize, true );
+            this.holes[i + numPowerHoles * 2] = new Hole( xPos, this.y + this.w - this.border - this.holeSize, this.holeSize, true );
+            this.holes[i + numPowerHoles * 3] = new Hole( xPos, this.y + this.w - this.border * 1.5 - this.holeSize * 2, this.holeSize, true );
+        }
     }
 
     draw() {
@@ -65,13 +78,8 @@ class Board {
         rect( this.x, this.y, this.l, this.powerWidth );
         rect( this.x, this.y + this.w, this.l, -this.powerWidth );
 
-        fill( 255, 0, 0 );
-        for ( let i = 0; i < this.powerGroups * this.numPerGroup; ++i ) {
-            let xPos = this.x + this.border + i * ( this.border / 2 + this.holeSize ) + Math.floor( i / this.numPerGroup ) * this.powerGap;
-            rect( xPos, this.y + this.border, this.holeSize, this.holeSize );
-            rect( xPos, this.y + this.border * 1.5 + this.holeSize, this.holeSize, this.holeSize );
-            rect( xPos, this.y + this.w - this.border - this.holeSize, this.holeSize, this.holeSize );
-            rect( xPos, this.y + this.w - this.border * 1.5 - this.holeSize * 2, this.holeSize, this.holeSize );
+        for ( let i = 0; i < this.powerGroups * this.numPerGroup * 4; ++i ) {
+            this.holes[i].draw();
         }
 
     }
