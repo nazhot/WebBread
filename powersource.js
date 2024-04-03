@@ -26,6 +26,5 @@ class PowerSource {
         rect( this.x, this.y + indicatorSize, indicatorSize, indicatorSize );
     }
 
-
-
+    run() {}
 }
